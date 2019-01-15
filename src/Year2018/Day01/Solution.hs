@@ -9,9 +9,9 @@ part1 :: String -> Int
 part1 input =  sum $ parse input
 
 part2 :: String -> Int
-part2 input = firstRepetition prefixes Set.empty
+part2 input = firstRepetition frequencies Set.empty
     where 
-        prefixes = scanl (+) 0 repeatedList
+        frequencies = scanl (+) 0 repeatedList
         repeatedList = cycle $ parse input
 
         firstRepetition (x:xs) seen =
