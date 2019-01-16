@@ -3,12 +3,11 @@ version:             0.1.0.0
 github:              "encse/adventofcode_haskell"
 license:             BSD3
 author:              "David Nemeth Csoka"
-maintainer:          "example@example.com"
+maintainer:          "encse@csokavar.hu"
 copyright:           "2019 David Nemeth Csoka"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -22,32 +21,13 @@ description:         Please see the README on GitHub at <https://github.com/encs
 dependencies:
 - base >= 4.7 && < 5
 
-library:
-  source-dirs:         src
-  exposed-modules:
-    - Year2018.Day01.Solution
-
-  dependencies:
-    - containers
-
 executables:
   aoc-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         src
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc
-
-tests:
-  aoc-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - aoc
+    - containers
