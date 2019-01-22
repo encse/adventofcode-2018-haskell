@@ -1,7 +1,8 @@
 module Year2018.Day03.Solution(solve) where
-import qualified Data.List as List
+
 import qualified Data.Matrix.Unboxed.Mutable as MUM
 import qualified Data.Matrix.Unboxed as MU
+
 import Text.Parsec
 import Control.Monad
 
@@ -14,7 +15,11 @@ data Claim = Claim { claimId :: Int
                    , claimWidth :: Int
                    , claimHeight :: Int
                    } deriving (Show)
+
+claimMaxX :: Claim -> Int
 claimMaxX c = claimX c + claimWidth c - 1
+
+claimMaxY :: Claim -> Int
 claimMaxY c = claimY c + claimHeight c - 1
 
 integer :: Parsec String () Int
@@ -39,10 +44,14 @@ parseInput input =
 
 part1 :: String -> Int
 part1 input = let
+    claims :: [Claim]
     claims = parseInput input
 
-    maxX = (maximum $ map claimMaxX claims) ::Int
-    maxY = (maximum $ map claimMaxY claims) ::Int
+    maxX :: Int
+    maxX = (maximum $ map claimMaxX claims)
+    
+    maxY :: Int
+    maxY = (maximum $ map claimMaxY claims)
 
     mat :: MU.Matrix Int
     mat = MU.create $ do 
@@ -54,11 +63,23 @@ part1 input = let
                     MUM.write m (x, y) (v + 1)
         return m
 
-    res = sum $ do
+    in sum $ do
         x <- [0 .. maxX]
         y <- [0 .. maxY]
         return $ if  mat MU.! (x,y) > 1 then 1 else 0
-    in res
 
 part2 :: String -> Int
-part2 input = 42
+part2 input = let
+    claims :: [Claim]
+    claims = parseInput input
+
+    intact :: Claim -> Bool
+    intact claim = all (not . overlap claim) claims
+
+    overlap :: Claim -> Claim -> Bool
+    overlap claimA claimB = 
+        (claimId claimA /= claimId claimB) &&
+        claimX claimA <= claimMaxX claimB && claimX claimB <= claimMaxX claimA &&
+        claimY claimA <= claimMaxY claimB && claimY claimB <= claimMaxY claimA
+
+    in claimId $ head $ filter intact claims
