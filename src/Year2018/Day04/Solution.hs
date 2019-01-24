@@ -1,12 +1,11 @@
 module Year2018.Day04.Solution(solve) where
 
-import qualified Data.Matrix as M
-import qualified Data.List as L
-
+import Data.List
+import Data.Function
 import Text.Parsec
-import Control.Monad
 
-import Debug.Trace
+import qualified Data.Matrix as M
+
 solve :: String -> [String]
 solve input = [show $ part1 input, show $ part2 input]
 
@@ -14,7 +13,7 @@ data DateTime = DateTime { dateTimeYear :: Int
                          , dateTimeMonth :: Int
                          , dateTimeDay :: Int
                          , dateTimeHour :: Int
-                         , dateTimeMin :: Int
+                         , dateTimeMinute :: Int
                          } deriving (Show, Eq, Ord)
 
 data Day = Day { dayGuardId :: Int
@@ -27,18 +26,18 @@ data TimeTable = TimeTable {
 } deriving (Show)
 
 totalSleep :: TimeTable -> Int
-totalSleep tt = sum $ M.flatten $ ttSleep tt
+totalSleep tt = M.foldl (+) 0 $ ttSleep tt
 
 sleepByMinute :: TimeTable -> [(Int,Int)]
-sleepByMinute tt = map (\t -> (t, sum $ M.takeColumn (ttSleep tt) t)) [0..59]
+sleepByMinute tt = (\t -> (t, sum $ M.takeColumn (ttSleep tt) t)) <$> [0..59]
 
 maxSleepByMinute :: TimeTable -> (Int,Int)
-maxSleepByMinute tt = L.maximumBy (\a b -> compare (snd a) (snd b)) $ sleepByMinute tt
+maxSleepByMinute tt = maximumBy (compare `on` snd) $ sleepByMinute tt
 
 parseInput :: String -> [TimeTable]
 parseInput input = 
 
-    let sortedLines = L.intercalate "\n" $ L.sort $ lines input
+    let sortedLines = intercalate "\n" $ sort $ lines input
     in 
         case parse days "" sortedLines of
             Left e -> error $ show e
@@ -58,7 +57,7 @@ parseInput input =
         sleep = do
             fallsAsleep <- dateTime <* string " falls asleep\n"
             wakesUp <- dateTime <* string " wakes up" <* optional (char '\n')
-            return (dateTimeMin fallsAsleep, dateTimeMin wakesUp)
+            return (dateTimeMinute fallsAsleep, dateTimeMinute wakesUp)
           
         dateTime :: Parsec String () DateTime
         dateTime = DateTime <$> 
@@ -68,38 +67,41 @@ parseInput input =
                 (string " " *> integer) <*>
                 (string ":" *> integer) <*
                 string "]"
-        
-         
+
         integer :: Parsec String () Int
         integer = read <$> many digit
         
         mask :: [(Int, Int)] -> [Int]
-        mask sleeps = 
-            do 
-                t <- [0..59]
-                return $ if any (\(fallsAsleep, wakesUp) -> fallsAsleep <= t && t < wakesUp) sleeps then 1 else 0
+        mask sleepIntervals = fromEnum . sleepsAt <$> [0..59]
+            where 
+                sleepsAt :: Int -> Bool
+                sleepsAt t = any (contains t) sleepIntervals
+                
+                contains :: Int -> (Int, Int) -> Bool
+                contains t (fallsAsleep, wakesUp) = fallsAsleep <= t && t < wakesUp
 
         timeTables :: [Day] -> [TimeTable]
         timeTables days = 
             do 
-                group <- L.groupBy (\dayA dayB -> dayGuardId dayA == dayGuardId dayB) $ 
-                         L.sortBy (\dayA dayB -> compare (dayGuardId dayA) (dayGuardId dayB)) days
-                let ttGuardId = dayGuardId $ head group
-                let ttSleep = M.fromLists $ map daySleep group
+                daysGroupedByGuard <- sortBy (compare `on` dayGuardId) days & 
+                                      groupBy ((==) `on` dayGuardId)
+
+                let ttGuardId = dayGuardId $ head daysGroupedByGuard
+                let ttSleep = M.fromLists $ map daySleep daysGroupedByGuard
                 return $ TimeTable ttGuardId ttSleep
 
 part1 :: String -> Int
 part1 input = 
     let 
         timeTables = parseInput input
-        tt = L.maximumBy (\ttA ttB -> compare (totalSleep ttA) (totalSleep ttB)) timeTables
-        minute = fst $ L.maximumBy (\a b -> compare (snd a) (snd b)) (sleepByMinute tt)
+        tt = maximumBy (compare `on` totalSleep) timeTables
+        minute = fst $ maximumBy (compare `on` snd) (sleepByMinute tt)
     in ttGuardId tt * minute
 
 part2 :: String -> Int
 part2 input =
     let 
         timeTables = parseInput input
-        tt = L.maximumBy (\ttA ttB -> compare (snd $ maxSleepByMinute ttA) (snd $ maxSleepByMinute ttB)) timeTables
+        tt = maximumBy (compare `on` snd . maxSleepByMinute) timeTables
         minute = fst $ maxSleepByMinute tt
     in ttGuardId tt * minute
