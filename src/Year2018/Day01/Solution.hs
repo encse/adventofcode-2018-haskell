@@ -1,9 +1,14 @@
-module Year2018.Day01.Solution(solve) where
+module Year2018.Day01.Solution(day01) where
 import Text.Read
 import qualified Data.Set as Set
+import Solver
 
-solve :: String -> [Int]
-solve input = [part1 input, part2 input]
+day01 = Solver {
+    name = "Chronal Calibration",
+    day = 1,
+    year = 2018,
+    solve = \input -> show <$> [part1 input, part2 input]
+}
 
 part1 :: String -> Int
 part1 input =  sum $ parse input

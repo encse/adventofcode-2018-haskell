@@ -1,4 +1,5 @@
-module Year2018.Day03.Solution(solve) where
+module Year2018.Day03.Solution(day03) where
+import Solver
 
 import qualified Data.Matrix.Unboxed.Mutable as MUM
 import qualified Data.Matrix.Unboxed as MU
@@ -6,8 +7,12 @@ import qualified Data.Matrix.Unboxed as MU
 import Text.Parsec
 import Control.Monad
 
-solve :: String -> [String]
-solve input = [show $ part1 input, show $ part2 input]
+day03 = Solver {
+    name = "No Matter How You Slice It",
+    year = 2018,
+    day = 3,
+    solve = \input -> show <$> [part1 input, part2 input]
+}
 
 data Claim = Claim { claimId :: Int
                    , claimX :: Int

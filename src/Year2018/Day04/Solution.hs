@@ -1,13 +1,17 @@
-module Year2018.Day04.Solution(solve) where
+module Year2018.Day04.Solution(day04) where
+import Solver
 
 import Data.List
 import Data.Function
 import Text.Parsec
-
 import qualified Data.Matrix as M
 
-solve :: String -> [String]
-solve input = [show $ part1 input, show $ part2 input]
+day04 = Solver {
+    name = "Repose Record",
+    year = 2018,
+    day = 4,
+    solve = \input -> show <$> [part1 input, part2 input]
+}
 
 data DateTime = DateTime { dateTimeYear :: Int
                          , dateTimeMonth :: Int

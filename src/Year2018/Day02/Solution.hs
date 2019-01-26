@@ -1,8 +1,13 @@
-module Year2018.Day02.Solution(solve) where
+module Year2018.Day02.Solution(day02) where
 import qualified Data.List as List
+import Solver
 
-solve :: String -> [String]
-solve input = [show $ part1 input, part2 input]
+day02 = Solver {
+    name = "Inventory Management System",
+    year = 2018,
+    day = 2,
+    solve = \input -> [show $ part1 input, part2 input]
+}
 
 part1 :: String -> Int
 part1 input =  hashCode  where 

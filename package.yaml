@@ -34,3 +34,5 @@ executables:
     - parsec
     - matrices
     - vector
+    - ansi-terminal
+    - criterion
