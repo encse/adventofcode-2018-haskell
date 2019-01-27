@@ -1,12 +1,15 @@
 module Year2018.Day02.Solution(day02) where
+
 import qualified Data.List as List
 import Solver
 
 day02 = Solver {
     name = "Inventory Management System",
-    year = 2018,
     day = 2,
-    solve = \input -> [show $ part1 input, part2 input]
+    year = 2018,
+    solve = \case
+        Part1 -> Just . show . part1 
+        Part2 -> Just . part2
 }
 
 part1 :: String -> Int

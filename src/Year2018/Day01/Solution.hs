@@ -7,7 +7,9 @@ day01 = Solver {
     name = "Chronal Calibration",
     day = 1,
     year = 2018,
-    solve = \input -> show <$> [part1 input, part2 input]
+    solve = \case
+        Part1 -> Just . show . part1 
+        Part2 -> Just . show . part2
 }
 
 part1 :: String -> Int

@@ -10,7 +10,9 @@ day04 = Solver {
     name = "Repose Record",
     year = 2018,
     day = 4,
-    solve = \input -> show <$> [part1 input, part2 input]
+    solve = \case
+        Part1 -> Just . show . part1 
+        Part2 -> Just . show . part2
 }
 
 data DateTime = DateTime { dateTimeYear :: Int

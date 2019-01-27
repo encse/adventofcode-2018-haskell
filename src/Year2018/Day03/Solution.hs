@@ -11,7 +11,9 @@ day03 = Solver {
     name = "No Matter How You Slice It",
     year = 2018,
     day = 3,
-    solve = \input -> show <$> [part1 input, part2 input]
+    solve = \case
+        Part1 -> Just . show . part1 
+        Part2 -> Just . show . part2
 }
 
 data Claim = Claim { claimId :: Int

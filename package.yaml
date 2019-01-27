@@ -25,6 +25,9 @@ executables:
   aoc-exe:
     main:                Main.hs
     source-dirs:         src
+    default-extensions:
+    - MultiWayIf
+    - LambdaCase
     ghc-options:
     - -threaded
     - -rtsopts
@@ -36,3 +39,4 @@ executables:
     - vector
     - ansi-terminal
     - criterion
+    - deepseq

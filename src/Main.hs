@@ -1,49 +1,73 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-
 
 module Main where
 import Control.Monad
+import System.Console.ANSI
+import Text.Printf
+import Criterion.Measurement
+import Control.Concurrent
+import Solver
+import Data.Maybe (listToMaybe)
+import Control.DeepSeq
 
 import Year2018.Day01.Solution
 import Year2018.Day02.Solution
 import Year2018.Day03.Solution
 import Year2018.Day04.Solution
-import System.Console.ANSI
-import Solver
-import Text.Printf
-import Criterion.Measurement
-import Control.Concurrent
 
 solvers = [day01, day02, day03, day04]
 
 runSolver :: Solver -> IO ()
 runSolver solver = do
+
     input <- readFile $ printf "src/year2018/day%02d/input.in" (day solver)
     refout <- readFile $ printf "src/year2018/day%02d/input.refout" (day solver)
-    let solution = solver `solve` input
-    let expecteds = lines refout
-    
-    setSGR [SetColor Foreground Vivid White]
-    putStrLn $ "Day " ++ show (day solver) ++ ": " ++ name solver
-    setSGR [Reset]
+
+    putStrWithColor Vivid White $ "Day " ++ show (day solver) ++ ": " ++ name solver
+    putStrLn ""
     putStrLn ""
     
-    let check = zip solution ((Just <$> expecteds) ++ repeat Nothing)
-    forM_ check $ \(a, me) -> do
-            let (color, status) = case me of
-                                    Just e 
-                                        | a == e -> (Green, "✓")
+    forM_ [Part1, Part2] $ \part -> do
+        initializeTime
+        tStart <- getTime
+        let !maybeSolution = force $ (solver `solve`) part input
+        tEnd <- getTime
+        let e = expected refout part
+        putStrLnResult maybeSolution e (tEnd - tStart)
+
+    putStrLn ""
+
+    where
+        putStrLnResult (Just solution) expected time = do
+            let (statusColor, status) = case expected of
+                                    Just expected 
+                                        | solution == expected -> (Green, "✓")
                                         | otherwise -> (Red, "x")
                                     Nothing -> (Cyan, "?")
+           
+            putStr "  "
+            putStrWithColor Dull statusColor status
+            putStr $ " " ++ solution
 
-            setSGR [SetColor Foreground Dull color]
-            putStr $ "  " ++ status
+            let timeColor = if
+                                | time < 1000  -> Green
+                                | time < 10000 -> Yellow
+                                | otherwise    -> Red
+
+            putStrWithColor Dull timeColor $ " (" ++ secs time ++ ")"
+            putStrLn ""
+
+        putStrLnResult _ _ _ = return ()
+
+        putStrWithColor intensity color st = do
+            setSGR [SetColor Foreground intensity color]
+            putStr st
             setSGR [Reset]
-            putStrLn $ " " ++ a
 
-    -- putStr $ " " ++ show (secs executionTime) ++ "seconds"
-    putStrLn ""
+expected :: String -> Part -> Maybe String
+expected input p = case p of
+    Part1 -> if length (lines input) > 0 then Just (lines input !! 0) else Nothing
+    Part2 -> if length (lines input) > 1 then Just (lines input !! 1) else Nothing
 
 main :: IO ()
 main = forM_ solvers runSolver
