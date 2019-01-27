@@ -23,13 +23,13 @@ part2 input = minimum candidates
             return $ length $ fullyReact filtered
 
 fullyReact :: String -> String 
-fullyReact = foldr reactTop []
+fullyReact = foldr add []
+    where
+        add :: Char -> String -> String
+        add ch [] = [ch]
+        add ch xxs@(x:xs)
+            | reacts ch x = xs
+            | otherwise   = ch : xxs
 
-reactTop :: Char -> String -> String
-reactTop ch [] = [ch]
-reactTop ch xxs@(x:xs)
-    | reacts x ch = xs
-    | otherwise = ch : xxs
-
-    where 
-        reacts chA chB = chA /= chB && toUpper chA == toUpper chB
+            where 
+                reacts chA chB = chA /= chB && toUpper chA == toUpper chB
