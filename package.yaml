@@ -40,3 +40,4 @@ executables:
     - ansi-terminal
     - criterion
     - deepseq
+    - text

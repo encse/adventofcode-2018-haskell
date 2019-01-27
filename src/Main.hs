@@ -4,6 +4,7 @@ module Main where
 import Control.Monad
 import System.Console.ANSI
 import Text.Printf
+import Data.Text(pack, unpack, stripEnd)
 import Criterion.Measurement
 import Control.Concurrent
 import Solver
@@ -14,13 +15,14 @@ import Year2018.Day01.Solution
 import Year2018.Day02.Solution
 import Year2018.Day03.Solution
 import Year2018.Day04.Solution
+import Year2018.Day05.Solution
 
-solvers = [day01, day02, day03, day04]
+solvers = [day01, day02, day03, day04, day05]
 
 runSolver :: Solver -> IO ()
 runSolver solver = do
 
-    input <- readFile $ printf "src/year2018/day%02d/input.in" (day solver)
+    input <- unpack . stripEnd . pack <$> readFile (printf "src/year2018/day%02d/input.in" (day solver))
     refout <- readFile $ printf "src/year2018/day%02d/input.refout" (day solver)
 
     putStrWithColor Vivid White $ "Day " ++ show (day solver) ++ ": " ++ name solver
