@@ -26,10 +26,9 @@ fullyReact :: String -> String
 fullyReact = foldr add []
     where
         add :: Char -> String -> String
-        add ch [] = [ch]
-        add ch xxs@(x:xs)
-            | reacts ch x = xs
-            | otherwise   = ch : xxs
+        add c [] = [c]
+        add c' (c:cs)
+            | reacts c c' = cs
+            | otherwise   = c':c:cs
 
-            where 
-                reacts chA chB = chA /= chB && toUpper chA == toUpper chB
+        reacts chA chB = chA /= chB && toUpper chA == toUpper chB

@@ -2,7 +2,7 @@ module Year2018.Day04.Solution(day04) where
 import Solver
 
 import Data.List
-import Data.Function
+import Data.Function((&), on)
 import Text.Parsec
 import qualified Data.Matrix as M
 

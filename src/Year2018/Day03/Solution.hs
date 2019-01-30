@@ -54,10 +54,8 @@ part1 input = let
     claims :: [Claim]
     claims = parseInput input
 
-    maxX :: Int
     maxX = (maximum $ map claimMaxX claims)
     
-    maxY :: Int
     maxY = (maximum $ map claimMaxY claims)
 
     mat :: MU.Matrix Int
