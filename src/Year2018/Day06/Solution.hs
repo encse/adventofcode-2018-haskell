@@ -1,17 +1,13 @@
 module Year2018.Day06.Solution(day06) where
-import Text.Parsec
 import Solver
-
 import Flow
-import qualified Data.Matrix.Mutable as MM
-import qualified Data.Matrix as M
-import qualified Data.Vector as V 
-
-import Data.List as L
-import Data.Function(on)
 import Control.Monad
-import Data.Maybe(mapMaybe)
+import Text.Parsec
+import qualified Data.Vector as V 
+import qualified Data.List as L
 import qualified Data.Set as Set
+import Data.Function(on)
+import Data.Maybe(mapMaybe)
 
 day06 = Solver {
     name = "...",
@@ -31,11 +27,11 @@ part1 :: String -> Int
 part1 input = let
     coords = parseInput input
 
-    minX = minimum (map getX coords) - 1
-    minY = minimum (map getY coords) - 1
+    minX = minimum (getX <$> coords) - 1
+    minY = minimum (getY <$> coords) - 1
 
-    maxX = maximum (map getX coords) + 1
-    maxY = maximum (map getY coords) + 1
+    maxX = maximum (getX <$> coords) + 1
+    maxY = maximum (getY <$> coords) + 1
 
     frame :: [Coord]
     frame = 
@@ -65,7 +61,8 @@ part1 input = let
             then Just closest
             else Nothing
 
-    biggestArea = mapMaybe closestFiniteCoord center 
+    biggestArea = center 
+                    |> mapMaybe closestFiniteCoord  
                     |> L.sort
                     |> L.group
                     |> L.sortBy (compare `on` (\x -> - length x)) 
