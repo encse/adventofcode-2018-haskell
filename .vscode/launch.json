@@ -14,10 +14,7 @@
         "ghciCmd": "stack ghci --test --no-load --no-build --main-is TARGET",
         "ghciEnv": {},
         "stopOnEntry": false,
-        //"hackageVersion": "0.10.0"
       },
-      
     ]
-
 
 }

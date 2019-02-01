@@ -32,6 +32,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O1
+    - -ddump-simpl
     dependencies:
     - containers
     - parsec
