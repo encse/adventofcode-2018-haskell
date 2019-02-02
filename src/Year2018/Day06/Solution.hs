@@ -99,7 +99,8 @@ borderAndCenter coords = let
         (Coord <$> [maxX] <*> [minY .. maxY]) ++
         (Coord <$> [minX .. maxX] <*> [minY]) ++
         (Coord <$> [minX .. maxX] <*> [maxY])
-    center =  
+
+    center = 
         Coord <$> [minX + 1 .. maxX -1] <*> [minY + 1 .. maxY- 1]
     
     in (border, center)
