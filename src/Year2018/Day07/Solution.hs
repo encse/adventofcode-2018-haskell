@@ -1,21 +1,18 @@
 {-# LANGUAGE LambdaCase #-}
-
 module Year2018.Day07.Solution(day07) where
+
 import Solver
 import Flow
 import Text.Parsec
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Graph as G
-import Debug.Trace
-
 import Control.Monad
 import Control.Monad.Writer.Lazy
 import Control.Monad.List
 import Data.Maybe(mapMaybe, fromMaybe)
 import Data.Char(ord)
 import Data.List(sort)
-import qualified Debug.Trace as D
 
 day07 = Solver {
     name = "The Sum of Its Parts",
@@ -26,9 +23,9 @@ day07 = Solver {
         Part2 -> Just . show . part2
 }
 
-newtype Job = Job Char deriving (Show, Eq, Ord)
-data Worker = Idle | Working Job Int deriving (Show, Eq, Ord)
-
+type Job = Char 
+type Time = Int
+data Worker = Idle | Working Job Time deriving (Show, Eq, Ord)
 newtype Graph = Graph (M.Map Job (S.Set Job)) deriving (Show)
 
 empty :: Graph
@@ -86,64 +83,60 @@ part1 :: String -> String
 part1 input = let
     g = parseInput input
     jobs = topSort g
-    in (\(Job j) -> j) <$> jobs
+    in jobs
 
 
-part2 :: String -> Int
+part2 :: String -> Time
 part2 input = let
-    g = parseInput input
 
-    step :: (Graph, [Worker]) -> (Graph, [Worker])
-    step (g, workers) = let
+    time :: Job -> Time
+    time job = 60 + ord job - ord 'A'
 
-        stepWorker :: (Worker, [Job]) -> (Worker, [Job])
-        stepWorker (worker, jobs) =
-            case worker of
-                Working _ 0 -> pickJob jobs
-                Working j t -> (Working j (t - 1), jobs)
-                Idle -> pickJob jobs
-                where 
-                    pickJob [] = (Idle, [])
-                    pickJob (job:jobs) = (Working job (time job), jobs)
-        
-        time :: Job -> Int
-        time (Job ch) = 60 + ord ch - ord 'A'
-
-        removeFinishedJobs :: [Worker] -> Graph -> Graph
-        removeFinishedJobs workers g = 
-            let
-                finishedJobs = workers |> mapMaybe (\case (Working j 0) -> Just j; _ -> Nothing)
-                q = finishedJobs
-            in
-                foldr removeNode g q
-        
-        availableJobs :: Graph -> [Worker]-> [Job]
-        availableJobs g workers = let
+    removeFinishedJobs :: [Worker] -> Graph -> Graph
+    removeFinishedJobs workers g = 
+        let
+            finishedJobs = workers |> mapMaybe (\case (Working j 0) -> Just j; _ -> Nothing)
+        in
+            foldr removeNode g finishedJobs
+    
+    availableJobs :: Graph -> [Worker]-> [Job]
+    availableJobs g workers = 
+        let
             inProgress = workers |> mapMaybe (\case (Working j _) -> Just j; _ -> Nothing) |> S.fromList
             noPrerequisites = g |> nodes |> filter (\node -> null $ prerequisites node g) |> S.fromList
             available =  S.difference noPrerequisites inProgress
-            in S.toList available |> sort
+        in 
+            S.toList available |> sort
 
-        g' = removeFinishedJobs workers g
+    stepWorkers :: [Worker] -> [Job] -> [Worker]
+    stepWorkers [] jobs = []
+    stepWorkers (worker: ws) jobs = 
+        let
+            (worker', jobs') = stepWorker (worker, jobs)
+        in 
+            worker' : stepWorkers ws jobs'
 
-        qqq :: [Worker] -> [Job] -> [Worker]
-        qqq [] jobs = []
-        qqq (worker: ws) jobs = let
-                (worker', jobs') = stepWorker (worker, jobs)
-            in worker' : qqq ws jobs'
+    stepWorker :: (Worker, [Job]) -> (Worker, [Job])
+    stepWorker (worker, jobs) =
+        case worker of
+            Working _ 0 -> pickJob jobs
+            Working j t -> (Working j (t - 1), jobs)
+            Idle -> pickJob jobs
+            where 
+                pickJob [] = (Idle, [])
+                pickJob (job:jobs) = (Working job (time job), jobs)
 
-        workers' = qqq workers (availableJobs g' workers)
-        in (g', workers')
-
-    run :: Graph -> [Worker] -> Int -> Int
-    run g workers i
-            | null (nodes g) && all (\case Idle -> True; _ -> False) workers  = i - 1
-            | otherwise = 
-                let 
-                    (g', workers') = step (g, workers)
-                in 
-                    run g' workers' (i + 1)
-    in run g [Idle, Idle, Idle, Idle, Idle] 0
+    runSimulation :: Graph -> [Worker] -> Time -> Time
+    runSimulation g workers i
+        | isEmpty g && all (\case Idle -> True; _ -> False) workers  = i - 1
+        | otherwise = 
+            let 
+                g' = removeFinishedJobs workers g
+                workers' = stepWorkers workers (availableJobs g' workers)
+            in 
+                runSimulation g' workers' (i + 1)
+    
+    in runSimulation (parseInput input) [Idle, Idle, Idle, Idle, Idle] 0
 
 parseInput :: String -> Graph
 parseInput input =
@@ -161,7 +154,7 @@ parseInput input =
             string " must be finished before step "
             a <- letter
             string " can begin."
-            return  (Job a , Job b)
+            return  (a, b)
 
         toGraph ::  [(Job, Job)] -> Graph
         toGraph dependencies = 
