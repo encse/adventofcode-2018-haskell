@@ -19,8 +19,9 @@ import Year2018.Day05.Solution
 import Year2018.Day06.Solution
 import Year2018.Day07.Solution
 import Year2018.Day08.Solution
+import Year2018.Day09.Solution
 
-solvers = [day01, day02, day03, day04, day05, day06, day07, day08]
+solvers = [day01, day02, day03, day04, day05, day06, day07, day08, day09]
 
 runSolver :: Solver -> IO ()
 runSolver solver = do
