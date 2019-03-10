@@ -39,3 +39,4 @@ executables:
     - flow
     - criterion
     - mtl
+    - ListZipper

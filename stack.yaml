@@ -62,3 +62,6 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+extra-deps:
+- ListZipper-1.2.0.2@sha256:5bbb5a4cc7f1cae962310407f711b874c087b48a0ba39b9fcce84cdb0ff5244c
