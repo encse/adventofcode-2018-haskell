@@ -1,4 +1,3 @@
-{-# LANGUAGE TupleSections #-}
 module Year2018.Day09.Solution(day09) where
 
 import Solver

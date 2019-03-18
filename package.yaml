@@ -40,3 +40,4 @@ executables:
     - criterion
     - mtl
     - ListZipper
+    - monad-loops
